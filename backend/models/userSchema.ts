@@ -15,12 +15,14 @@ interface Course {
 }
 
 interface UserModel extends Document{
+    _id: mongoose.Types.ObjectId,
     firstName:string,
     lastName:string,
     email:string,
     password:string,
-    confirmPassword:string,
+    confirmPassword:string | undefined,
     role:userRole,
+    isVerified:boolean,
     courses:Course [],
     resetPasswordToken:string,
     resetPasswordExpiresDate:Date,
@@ -50,7 +52,8 @@ const userSchema = new Schema<UserModel>({
                 return validator.isEmail(v);
             },
             message:(props:any)=> `${props.value} is not a valid Email Address`
-        }
+        },
+        unique:true
     },
     password:{
         type:String,
@@ -59,7 +62,7 @@ const userSchema = new Schema<UserModel>({
     },
     confirmPassword:{
         type:String,
-        required:[true,'Confirm Password is required'],
+        // required:[true,'Confirm Password is required'],
         validate:{
             validator:function(v:string):boolean{
                 return v === this.password;
@@ -71,6 +74,10 @@ const userSchema = new Schema<UserModel>({
         type:String,
         enum:Object.values(userRole),
         default:userRole.STUDENT
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
     },
     courses:[
         {
@@ -89,6 +96,14 @@ const userSchema = new Schema<UserModel>({
     verificationToken:String,
     verificationTokenExpiresDate:Date
 })
+
+
+userSchema.pre('save', function (next) {
+  
+    // Remove confirmPassword before saving the document
+    this.confirmPassword = undefined;
+    next();
+});
 
 const User = model<UserModel>('User', userSchema);
 
