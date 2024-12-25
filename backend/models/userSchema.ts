@@ -26,8 +26,8 @@ interface UserModel extends Document{
     courses:Course [],
     resetPasswordToken:string,
     resetPasswordExpiresDate:Date,
-    verificationToken:string,
-    verificationTokenExpiresDate:string
+    verificationToken:string | undefined,
+    verificationTokenExpiresDate:string | undefined,
 }
 
 

@@ -3,7 +3,8 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcryptjs'; 
 import generateTokenAndSetToken from "../utils/generateTokenAndSetCookie";
 import mongoose from "mongoose"; 
-import { sendVerificationEmail } from "../mails/email";
+import { sendVerificationEmail,sendWelcomeEmail } from "../mails/email";
+
 
 interface SignUpRequestBody {
     firstName: string;
@@ -12,16 +13,17 @@ interface SignUpRequestBody {
     password: string;
     confirmPassword: string;
 }
+interface SignInReqBody{
+    code:string,
+    // verificationTokenExpiresAt:Date;
+}
 
 const signup = async (req: Request<{}, {}, SignUpRequestBody>, res: Response):Promise<any> => {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
-
- 
     try {
         if (!firstName || !lastName || !email || !password || !confirmPassword) {
             return res.status(404).json({ success: false, message: "All fields are required" });
         }
-
         if (password !== confirmPassword) {
             return res.status(400).json({ success: false, message: "Passwords do not match" });
         }
@@ -35,9 +37,6 @@ const signup = async (req: Request<{}, {}, SignUpRequestBody>, res: Response):Pr
         const hashPassword: string = await bcrypt.hash(password, 10);
 
         const verificationToken: string = Math.floor(100000 + Math.random() * 900000).toString();
-
-
-           console.log(password, confirmPassword);
         const user = new User({
             firstName,
             lastName,
@@ -66,6 +65,31 @@ const signup = async (req: Request<{}, {}, SignUpRequestBody>, res: Response):Pr
     }
 };
 
+const verifyEmail = async(req:Request<{}, {},SignInReqBody>, res:Response):Promise<any> =>{
+    const {code}= req.body;
+    try{
+        const user = await User.findOne({
+            verificationToken:code,
+            verificationTokenExpiresDate:{$gte:Date.now()}
+        });
+        if(!user) return res.status(404).json({ success: false, message: "Invalid or exired Token"});
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpiresDate = undefined;
+        await user.save();
+        await sendWelcomeEmail(user.email, user.firstName);
+        const userObject = user.toObject(); 
+        res.status(200).json({success:true, message:"Email Verified sucessfuly", user:{
+            ...userObject, 
+            password:undefined
+        }})
+
+    }catch(err:unknown){
+        console.log(err);
+        return res.status(500).json({ success: false, message: err });
+    }
+}
 
 
-export default signup
+export {signup, verifyEmail};
