@@ -22,10 +22,11 @@ interface UserModel extends Document{
     password:string,
     confirmPassword:string | undefined,
     role:userRole,
+    lastLogin:Date,
     isVerified:boolean,
     courses:Course [],
-    resetPasswordToken:string,
-    resetPasswordExpiresDate:Date,
+    resetPasswordToken:string | undefined,
+    resetPasswordExpiresDate:Date | undefined,
     verificationToken:string | undefined,
     verificationTokenExpiresDate:string | undefined,
 }
@@ -59,6 +60,10 @@ const userSchema = new Schema<UserModel>({
         type:String,
         required:[true, 'Password is required'],
         minlength:[8, 'Password must be at least 8 characters']
+    },
+    lastLogin:{
+        type:Date,
+        default:Date.now()
     },
     confirmPassword:{
         type:String,
