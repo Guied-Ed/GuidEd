@@ -4,6 +4,7 @@ dotenv.config()
 const app:Application = express();
 import connectDB from './db/dbConnection';
 import userRouter from './routes/userRouter';
+import cookieParser from 'cookie-parser'
 
 
 
@@ -12,6 +13,7 @@ import userRouter from './routes/userRouter';
 
 
 app.use(express.json());
+app.use(cookieParser());
 app.use('/api',userRouter);
 const port: number = parseInt(process.env.PORT || '3000',10);
 
