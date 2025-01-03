@@ -6,6 +6,13 @@ interface DecodedToken {
     role: string;
 }
 
+
+
+// Extending the Request interface to include userId
+export interface CustomRequest extends Request {
+  userId?: string; // Optional, assuming userId might be undefined if not authenticated
+}
+
 const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
     const token = (req as any).cookies?.token;
     if (!token) {
