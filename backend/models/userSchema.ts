@@ -1,6 +1,7 @@
 
 import mongoose, {Document, Schema,model} from 'mongoose';
 import validator from 'validator'
+import Course from './courseSchema';
 
 enum userRole{
     ADMIN='admin',
@@ -21,7 +22,7 @@ interface UserModel extends Document{
     email:string,
     password:string,
     confirmPassword:string | undefined,
-    role:userRole,
+    role?:userRole,
     lastLogin:Date,
     isVerified:boolean,
     courses:Course [],
@@ -103,8 +104,23 @@ const userSchema = new Schema<UserModel>({
 })
 
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', async function (next) {
   
+    if(this.role === userRole.INSTRUCTOR){
+        try{
+            const courses = await Course.find({instructor:this._id});
+
+            this.courses = courses.map(course=> ({
+                courseId:course._id as mongoose.Types.ObjectId,
+                enrolledDate: new Date(),
+                progress: 0,
+            }))
+        }catch(error:unknown){
+            return next(error as mongoose.CallbackError);
+        }
+    this.courses = [];
+    }
+
     // Remove confirmPassword before saving the document
     this.confirmPassword = undefined;
     next();

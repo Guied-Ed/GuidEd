@@ -12,6 +12,8 @@ interface SignUpRequestBody {
     email: string;
     password: string;
     confirmPassword: string;
+    role:string
+    
 }
 
 interface SignInReqBody {
@@ -30,7 +32,7 @@ interface resetPassord {
     password: string
 }
 const signup = async (req: Request<{}, {}, SignUpRequestBody>, res: Response): Promise<any> => {
-    const { firstName, lastName, email, password, confirmPassword } = req.body;
+    const { firstName, lastName, email, password, confirmPassword, role } = req.body;
     try {
         if (!firstName || !lastName || !email || !password || !confirmPassword) {
             return res.status(404).json({ success: false, message: "All fields are required" });
@@ -49,11 +51,14 @@ const signup = async (req: Request<{}, {}, SignUpRequestBody>, res: Response): P
 
         const verificationToken: string = Math.floor(100000 + Math.random() * 900000).toString();
         const hashedToken: string = await bcrypt.hash(verificationToken, 8);
+
+        const userRole = role && role === 'instructor'? 'instructor' : 'student'
         const user = new User({
             firstName,
             lastName,
             email,
             password: hashPassword,
+            role:userRole,
             // confirmPassword,
             verificationToken: hashedToken,
             verificationTokenExpiresDate: Date.now() + 24 * 60 * 60 * 1000
