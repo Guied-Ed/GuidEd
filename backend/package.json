@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
+    "dev": "ts-node-dev index",
+    "format": "prettier --write \"**/*.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -39,6 +41,7 @@
     "@types/multer": "^1.4.12",
     "@types/node": "^22.10.2",
     "@types/validator": "^13.12.2",
+    "prettier": "^3.4.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.2"
   }
