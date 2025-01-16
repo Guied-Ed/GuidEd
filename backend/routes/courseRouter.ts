@@ -1,20 +1,23 @@
-// routes/courseRouter.ts
+// routes/courseRoutes.ts
+
 import express, { Router } from "express";
-import upload from "../utils/config/multer";
-import createCourse from "../controllers/courseController";
+import { upload } from "../middleware/multerMiddleWare";  // Import the upload middleware
 import verifyToken from "../middleware/verifyToken";
 import isInstructor from "../middleware/roleMiddleWare";
+import { uploadFilesAndCreateCourse } from "../controllers/courseController";
+import { CustomRequest } from "../controllers/courseController";
 const router: Router = express.Router();
 
+// Add the upload middleware for handling files (thumbnail, videos)
 router.post(
   '/upload-course',
-  verifyToken, // Middleware to verify the token and add userId to req
+  // verifyToken, // Middleware to verify the token and add userId to req
+  // isInstructor, 
   upload.fields([
-    { name: 'thumbnail', maxCount: 1 }, // Single thumbnail file
-    { name: 'videos', maxCount: 5 },     // Multiple video files (up to 5)
+    { name: 'thumbnail', maxCount: 1 }, // Expect a single thumbnail file
+    { name: 'videos', maxCount: 5 }, // Expect multiple videos, adjust maxCount as needed
   ]),
-  isInstructor,
-  createCourse // Controller to create the course
+  (req, res) => uploadFilesAndCreateCourse(req as CustomRequest, res) // Type assertion here
 );
 
 export default router;

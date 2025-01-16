@@ -15,7 +15,13 @@ app.use("/api/course", courseRouter);
 app.use("/api/cart", cartRouter);
 const port: number = parseInt(process.env.PORT || "3000", 10);
 
+
 app.listen(port, (): void => {
   connectDB();
   console.log(`Listening on port ${port}`);
+
+app.listen(3000, (): void => {
+    connectDB();
+    console.log(`Listening on port ${port}`);
+
 });

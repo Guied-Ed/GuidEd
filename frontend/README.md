@@ -1,36 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# GuidEd Front-End Documentation
 
-## Getting Started
+This document serves as a reference for all implemented pages and UI designs in the GuidEd project. It covers general workflows, page-specific details, collaboration guidelines with the UI/UX designer, and backend integration.
 
-First, run the development server:
+## 1. General Workflow
 
+### Cloning and Setup
+
+Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository_url>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Navigate to the front-end folder:
+```bash
+cd Frontend
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Install dependencies:
+```bash
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Folder Structure
+Organize files as follows:
+```scss
+src/
+├── components/     // Reusable UI components
+├── pages/          // Individual page components
+├── assets/         // Images, icons, and other static assets
+├── services/       // API calls and backend integration
+├── styles/         // TailwindCSS and global styles
+├── utils/          // Helper functions and utilities
+└── App.js          // Main application entry point
+```
 
-## Learn More
+## 2. Collaboration with UI/UX Designer
 
-To learn more about Next.js, take a look at the following resources:
+- Review design prototypes (Figma/Adobe XD) provided by the UI/UX team.
+- Maintain pixel-perfect implementation using Tailwind CSS.
+- Regular feedback loops to ensure the final product matches the design.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 3. Page-Specific Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Sign-Up Page
+**Description:** A page for user registration.  
+**Location:** `src/pages/SignUp.js`
 
-## Deploy on Vercel
+**Features:**
+- Input fields for first name, last name, email, password, and confirm password.
+- Smooth animations using Framer Motion.
+- Backend API integration for user registration.
+- Dependencies: `react-icons`, `framer-motion`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Login Page
+**Description:** A page for user login.  
+**Location:** `src/pages/Login.js`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Features:**
+- Input fields for email and password.
+- Password recovery link.
+- Smooth button animations using Framer Motion.
+
+### Dashboard
+**Description:** A user dashboard showing personalized content.  
+**Location:** `src/pages/Dashboard.js`
+
+**Features:**
+- Dynamic data rendering from backend APIs.
+- Interactive navigation to sub-modules.
+
+## 4. Design Standards
+
+### Typography
+- Font Family: Inter, Roboto, or the font specified by the UI/UX designer.
+- Font Sizes and Weights: Adhere to the provided style guide.
+
+### Color Palette
+- Maintain the theme colors specified in the design system.
+- Use Tailwind classes for consistent styling.
+
+### Icons
+- Use react-icons or custom SVGs provided by the UI/UX designer.
+- Ensure icons match the design prototype.
+
+### Animations
+- Implement subtle animations using Framer Motion for buttons, form transitions, and page loads.
+- Keep animations smooth and performance-friendly.
+
+## 5. Backend API Integration
+
+### API Services
+Store all API logic in `src/services/api.js` for easy reuse.  
+Example structure:
+```javascript
+import axios from "axios";
+
+const API = axios.create({
+  baseURL: "https://api.guided.com",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+export default API;
+```
+
+### API Testing
+- Use tools like Postman or Insomnia to test endpoints before integrating them into the UI.
+- Ensure error handling covers all scenarios (e.g., network errors, invalid responses).
+
+## 6. Front-End Standards
+
+### Code Styling
+- Use ESLint and Prettier for consistent formatting.
+- Follow functional component patterns with React hooks.
+
+### Responsive Design
+- Test all components across devices (mobile, tablet, desktop).
+- Use Tailwind's responsive utilities (`sm`, `md`, `lg`) to adapt layouts.
+
+### Reusability
+- Abstract common elements (e.g., input fields, buttons) into reusable components in `src/components`.
+
+### Version Control
+- Commit changes with descriptive messages:
+```bash
+git commit -m "Implemented Login Page with API integration"
+```
+- Push changes to feature branches and open pull requests for code reviews.
+
+## 7. Collaboration Guidelines
+
+### Team Communication
+- Share progress daily in the team stand-ups.
+- Highlight any blockers or dependencies from other teams.
+
+### Code Reviews
+- Submit pull requests for every feature or page implemented.
+- Peer review all code before merging into the main branch.
+
+### Design Feedback
+- Regularly sync with the UI/UX designer to align on design changes or discrepancies.
+
+## 8. Tools and Resources
+
+### Libraries
+- React, Tailwind CSS, Framer Motion, React Icons, Axios.
+
+### UI/UX Tools
+- Figma, Adobe XD.
+
+### Testing Tools
+- Postman (API testing), Browser DevTools (UI testing).
+
+## 9. Future Improvements
+- Create a Style Guide for typography, spacing, and colors to standardize designs across pages.
+- Implement State Management using Context API or Redux for large-scale state handling.
+- Optimize performance by code-splitting and lazy-loading components.

@@ -1,9 +1,26 @@
 // controllers/courseController.ts
 
-import { Response } from 'express';
-import mongoose from 'mongoose';
-import Course from '../models/courseSchema'; // Assuming the Course model is defined in this file
-import { CustomRequest } from '../middleware/verifyToken'; // Import CustomRequest type
+import { Request, Response } from 'express';
+import { uploadToCloudinary } from '../middleware/multerMiddleWare';
+import Course from '../models/courseSchema';
+
+interface multerFile {
+  buffer: Buffer;
+  originalName: string
+}
+
+ export interface CustomRequest extends Request {
+  userId?: string;
+  files?: { [fieldname: string]: Express.Multer.File[] } | undefined;
+  body: {
+    tittle: string;
+    description: string;
+    duration: number;
+    category: string;
+    price: number;
+    level: string;
+  }
+}
 
 type Video = {
   tittle: string;
@@ -12,68 +29,69 @@ type Video = {
   description?: string;
 };
 
-interface CourseRequestBody {
-  tittle: string;
-  description: string;
-  duration: number;
-  category: string;
-  price: number;
-  level: string;
-  thumbnail: string;
-  videos: Video[];
-}
+const uploadFilesAndCreateCourse = async (req: CustomRequest, res: Response) => {
+  const { thumbnail, videos } = req.files || {};
+  const { tittle, description, duration, category, price, level } = req.body;
 
-const createCourse = async (req: CustomRequest, res: Response): Promise<any> => {
-    const userId = req.userId;
-
-  if (!userId) {
-    return res.status(401).json({ success: false, message: "User is not authenticated" });
-   
+  if (!thumbnail || thumbnail.length === 0 || !videos || videos.length === 0) {
+    res.status(400).json({ error: 'Thumbnail and videos are required' });
+    return;
   }
 
-  const { tittle, description, duration, category, price, level, videos,thumbnail } = req.body as CourseRequestBody;
+  console.log('Files:', req.files);
 
-  if (!tittle || !description || !category || !price || !level || !videos || !thumbnail) {
-    return res.status(400).json({ success: false, message: "Missing required fields" });
+
+  console.log('Uploading Thumbnail:', { buffer: thumbnail[0].buffer, folder: 'guided/thumbnails', type: 'image' });
+  console.log('Uploading Video:', { buffer: videos[0].buffer, folder: 'guided/videos', type: 'video' });
   
-  }
 
   try {
-    if (!req.files || !('thumbnail' in req.files)) {
-      return res.status(400).json({ success: false, message: 'Thumbnail is required' });
-     
-    }
+    const thumbnailUpload = await uploadToCloudinary(
+      thumbnail[0].buffer,
+      'guided/thumbnails',
+      'image'
+    );
 
-    if (!req.files?.videos || req.files.videos.length === 0) {
-      return res.status(400).json({ success: false, message: 'At least one video is required' });
-     
-    }
+    const videoData: Video[] = await Promise.all(
+      videos.map(async (v) => {
+        const videoUpload = await uploadToCloudinary(
+          v.buffer,
+          'guided/videos',
+          'video'
+        );
 
-    const thumbnailPath = req.files.thumbnail[0].path; // Cloudinary URL for the thumbnail
-    const videoFiles = req.files.videos.map((file: any) => ({
-      tittle: file.originalname,
-      videoFilePath: file.path, // Cloudinary URL for each video
-    }));
+        return {
+          tittle: v.originalname, // Using the original file name as the title
+          videoFilePath: videoUpload.secure_url, // Cloudinary URL
+          duration: undefined, // Optional field, set as needed
+          description: undefined, // Optional field, set as needed
+        };
+      })
+    );
 
     const newCourse = new Course({
       tittle,
       description,
-      instructor: userId,
       duration,
       category,
       price,
       level,
-      thumbnail: thumbnailPath,
-      videos: videoFiles,
+      thumbnail: thumbnailUpload.secure_url,
+      videos: videoData, // Store video data in the appropriate format
     });
 
-    const savedCourse = await newCourse.save();
+    await newCourse.save();
 
-    return res.status(201).json({ success: true, course: savedCourse });
+    // Respond with success message and the created course
+    res.status(201).json({
+      message: 'Course created successfully!',
+      course: newCourse,
+    });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ success: false, message: "Failed to create course" });
+    console.error('Error uploading files and creating course:', error);
+    console.log(error)
+    res.status(500).json({ error: 'File upload or course creation failed' });
   }
 };
 
-export default createCourse;
+export { uploadFilesAndCreateCourse };
