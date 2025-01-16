@@ -1,42 +1,56 @@
-GuidEd Front-End Documentation
+#GuidEd Front-End Documentation
+
 This document serves as a reference for all implemented pages and UI designs in the GuidEd project. It covers general workflows, page-specific details, collaboration guidelines with the UI/UX designer, and backend integration.
 
 1. General Workflow
    Cloning and Setup:
 
 Clone the repository:
-bash
-Copy code
-git clone <repository_url>
-Navigate to the front-end folder:
-bash
-Copy code
-cd Frontend
-Install dependencies:
-bash
-Copy code
-npm install
-Folder Structure: Organize files as follows:
 
-scss
-Copy code
+``` bash
+git clone <repository_url>
+```
+
+Navigate to the front-end folder:
+
+``` bash
+cd Frontend
+```
+Install dependencies:
+
+``` bash
+npm install
+```
+
+## Folder Structure
+Organize files as follows:
+
+``` scss
 src/
-├── components/ // Reusable UI components
-├── pages/ // Individual page components
-├── assets/ // Images, icons, and other static assets
-├── services/ // API calls and backend integration
-├── styles/ // TailwindCSS and global styles
-├── utils/ // Helper functions and utilities
-└── App.js // Main application entry point
-Collaboration with UI/UX Designer:
+├── components/     // Reusable UI components
+├── pages/          // Individual page components
+├── assets/         // Images, icons, and other static assets
+├── services/       // API calls and backend integration
+├── styles/         // TailwindCSS and global styles
+├── utils/          // Helper functions and utilities
+└── App.js          // Main application entry point
+```
+
+## Collaboration with UI/UX Designer
 
 Review design prototypes (Figma/Adobe XD) provided by the UI/UX team.
 Maintain pixel-perfect implementation using Tailwind CSS.
-Regular feedback loops to ensure the final product matches the design. 2. Page-Specific Documentation
-Sign-Up Page
-Description: A page for user registration.
-Location: src/pages/SignUp.js
-Features:
+1. Regular feedback loops to ensure the final product matches the design.
+2. Page-Specific Documentation
+
+## Sign-Up Page
+
+**Description:** A page for user registration.
+
+**Location:** src/pages/SignUp.js
+
+## Features
+
 Input fields for first name, last name, email, password, and confirm password.
 Smooth animations using Framer Motion.
 Backend API integration for user registration.
