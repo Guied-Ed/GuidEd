@@ -18,7 +18,7 @@ app.use('/api',userRouter);
 app.use('/api/course',courseRouter);
 const port: number = parseInt(process.env.PORT || '3000',10);
 
-app.listen(port, (): void => {
+app.listen(3000, (): void => {
     connectDB();
     console.log(`Listening on port ${port}`);
 });
