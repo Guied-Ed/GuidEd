@@ -1,3 +1,4 @@
+import createError from 'http-errors';
 import express, { Application } from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -7,9 +8,25 @@ import userRouter from './routes/userRouter';
 import cookieParser from 'cookie-parser';
 import courseRouter from './routes/courseRouter';
 import os from 'node:os';
+import { NextFunction, Request, Response } from 'express';
 
 app.use(express.json());
 app.use(cookieParser());
+
+// catch 404 error and forward it to hander
+app.use(function (req: Request, res: Response, next: NextFunction) {
+    next(createError(404));
+});
+
+// error handler
+app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
+    res.status(error.status || 500);
+    res.json({
+        success: false,
+        message: error.message,
+    });
+});
+
 app.use('/api', userRouter);
 app.use('/api/course', courseRouter);
 
